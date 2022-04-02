@@ -3,11 +3,11 @@
 #include "DHT.h"
 
 // You need to edit with your network credentials.
-#define WIFI_NAME "YOUR_WIFI_NAME"
-#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
+#define WIFI_NAME "YOUR_WIFI_NAME"//"YOUR_WIFI_NAME"
+#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"//"YOUR_WIFI_PASSWORD"
 
 // You need to edit with your ThingSpeak information.
-String writeAPIKey = "YOUR_WRITE_API_KEY";
+String writeAPIKey="YOUR_WRITE_API_KEY";//"YOUR_WRITE_API_KEY"
 
 // DHT information
 #define DHTPIN D2
@@ -21,6 +21,7 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println();
+  delay(2000);
 
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
 
@@ -44,15 +45,12 @@ void setup()
 void loop() {
     //Send an HTTP POST request every 20 seconds
     if ((millis() - lastTime) > delayTime) {
-        httpPostRequest();
+        httpGETRequest();
         lastTime = millis();
     }
 }
 
-void httpGETRequest() {
-    WiFiClient client;
-    HTTPClient http;
-    
+void httpGETRequest() {    
     // Read DHT sensor
     float h = dht.readHumidity();    // Read humidity in %
     float t = dht.readTemperature(); // Read temperature as Celsius (the default)
@@ -61,7 +59,14 @@ void httpGETRequest() {
         Serial.println(F("Failed to read from DHT sensor!"));
         return;
     }
+    Serial.print(F("Humidity: "));
+    Serial.print(h);
+    Serial.print(F("%  Temperature: "));
+    Serial.println(t);
 
+    WiFiClient client;
+    HTTPClient http;
+    
     // Build URL GET path.
     String urlPath = "http://api.thingspeak.com/update?api_key=" + writeAPIKey + "&field1=" + String(t) + "&field2=" + String(h);
 
@@ -92,7 +97,11 @@ void httpPostRequest() {
         Serial.println(F("Failed to read from DHT sensor!"));
         return;
     }
-
+    Serial.print(F("Humidity: "));
+    Serial.print(h);
+    Serial.print(F("%  Temperature: "));
+    Serial.println(t);
+  
     WiFiClient client;
     HTTPClient http;
     http.begin(client, "http://api.thingspeak.com/update.json");
